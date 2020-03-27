@@ -16,11 +16,11 @@
 
 package com.google.zxing.client.android.result;
 
+import android.app.Activity;
+
 import com.google.zxing.Result;
 import com.google.zxing.client.android.R;
 import com.google.zxing.client.result.ParsedResult;
-
-import android.app.Activity;
 
 /**
  * This class handles TextParsedResult as well as unknown formats. It's the fallback handler.
@@ -42,7 +42,7 @@ public final class TextResultHandler extends ResultHandler {
 
   @Override
   public int getButtonCount() {
-    return hasCustomProductSearch() ? buttons.length : buttons.length - 1;
+    return  buttons.length - 1;
   }
 
   @Override
@@ -64,7 +64,7 @@ public final class TextResultHandler extends ResultHandler {
         shareBySMS(text);
         break;
       case 3:
-        openURL(fillInCustomSearchURL(text));
+//        openURL(fillInCustomSearchURL(text));
         break;
     }
   }

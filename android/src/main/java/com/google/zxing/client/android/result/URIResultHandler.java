@@ -16,12 +16,11 @@
 
 package com.google.zxing.client.android.result;
 
-import com.google.zxing.client.android.LocaleManager;
+import android.app.Activity;
+
 import com.google.zxing.client.android.R;
 import com.google.zxing.client.result.ParsedResult;
 import com.google.zxing.client.result.URIParsedResult;
-
-import android.app.Activity;
 
 import java.util.Locale;
 
@@ -50,9 +49,9 @@ public final class URIResultHandler extends ResultHandler {
 
   @Override
   public int getButtonCount() {
-    if (LocaleManager.isBookSearchUrl(((URIParsedResult) getResult()).getURI())) {
-      return buttons.length;
-    }
+//    if (LocaleManager.isBookSearchUrl(((URIParsedResult) getResult()).getURI())) {
+//      return buttons.length;
+//    }
     return buttons.length - 1;
   }
 
@@ -81,7 +80,7 @@ public final class URIResultHandler extends ResultHandler {
         shareBySMS(uri);
         break;
       case 3:
-        searchBookContents(uri);
+//        searchBookContents(uri);
         break;
     }
   }
