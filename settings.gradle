@@ -1,0 +1,4 @@
+rootProject.name='zxing'
+include ':android'
+include ':core'
+include ':android-core'
