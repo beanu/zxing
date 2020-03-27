@@ -6,6 +6,8 @@
 扫一扫的第三方库，大部分都是基于zxing做的上层开发。大厂也不公开他们优化的源码。因此，这次通过收集大厂的优化方案，自己实现一套
 
 
+基于[zxing 3.4.0 Latest commit 24a5f9c on 16 Feb](https://github.com/zxing/zxing)
+
 ## 扫描性能优化
 - 去除zxing额外支持的格式
 - 删除zxing冗余代码
