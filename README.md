@@ -25,3 +25,4 @@
 ### 参考文章
 * [字节跳动技术方案](https://zhuanlan.zhihu.com/p/44845942)
 * [爱奇艺二维码优化](https://mp.weixin.qq.com/s/tB7htYzrmP0wGUFCkCvBUw)
+* [二维码放大摄像头](https://www.jianshu.com/p/710e3d29dfaf)
