@@ -76,10 +76,6 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     private static final long DEFAULT_INTENT_RESULT_DURATION_MS = 1500L;
     private static final long BULK_MODE_SCAN_DELAY_MS = 1000L;
 
-    private static final String[] ZXING_URLS = {"http://zxing.appspot.com/scan", "zxing://scan/"};
-
-    private static final int HISTORY_REQUEST_CODE = 0x0000bacc;
-
     private static final Collection<ResultMetadataType> DISPLAYABLE_METADATA_TYPES =
             EnumSet.of(ResultMetadataType.ISSUE_NUMBER,
                     ResultMetadataType.SUGGESTED_PRICE,
@@ -95,9 +91,9 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     private Result lastResult;
     private boolean hasSurface;
 
-    private IntentSource source;
+        private IntentSource source;
     private String sourceUrl;
-    private ScanFromWebPageManager scanFromWebPageManager;
+    //    private ScanFromWebPageManager scanFromWebPageManager;
     private Collection<BarcodeFormat> decodeFormats;
     private Map<DecodeHintType, ?> decodeHints;
     private String characterSet;
@@ -147,11 +143,11 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
         // off screen.
         cameraManager = new CameraManager(getApplication());
 
-        viewfinderView = (ViewfinderView) findViewById(R.id.viewfinder_view);
+        viewfinderView = findViewById(R.id.viewfinder_view);
         viewfinderView.setCameraManager(cameraManager);
 
         resultView = findViewById(R.id.result_view);
-        statusView = (TextView) findViewById(R.id.status_view);
+        statusView = findViewById(R.id.status_view);
 
         handler = null;
         lastResult = null;
@@ -166,7 +162,6 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 
         resetStatusView();
 
-
         beepManager.updatePrefs();
         ambientLightManager.start(cameraManager);
 
@@ -179,7 +174,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 
         source = IntentSource.NONE;
         sourceUrl = null;
-        scanFromWebPageManager = null;
+//        scanFromWebPageManager = null;
         decodeFormats = null;
         characterSet = null;
 
@@ -187,56 +182,6 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 
             String action = intent.getAction();
             String dataString = intent.getDataString();
-
-            if (Intents.Scan.ACTION.equals(action)) {
-
-                // Scan the formats the intent requested, and return the result to the calling activity.
-                source = IntentSource.NATIVE_APP_INTENT;
-                decodeFormats = DecodeFormatManager.parseDecodeFormats(intent);
-                decodeHints = DecodeHintManager.parseDecodeHints(intent);
-
-                if (intent.hasExtra(Intents.Scan.WIDTH) && intent.hasExtra(Intents.Scan.HEIGHT)) {
-                    int width = intent.getIntExtra(Intents.Scan.WIDTH, 0);
-                    int height = intent.getIntExtra(Intents.Scan.HEIGHT, 0);
-                    if (width > 0 && height > 0) {
-                        cameraManager.setManualFramingRect(width, height);
-                    }
-                }
-
-                if (intent.hasExtra(Intents.Scan.CAMERA_ID)) {
-                    int cameraId = intent.getIntExtra(Intents.Scan.CAMERA_ID, -1);
-                    if (cameraId >= 0) {
-                        cameraManager.setManualCameraId(cameraId);
-                    }
-                }
-
-                String customPromptMessage = intent.getStringExtra(Intents.Scan.PROMPT_MESSAGE);
-                if (customPromptMessage != null) {
-                    statusView.setText(customPromptMessage);
-                }
-
-            } else if (dataString != null &&
-                    dataString.contains("http://www.google") &&
-                    dataString.contains("/m/products/scan")) {
-
-                // Scan only products and send the result to mobile Product Search.
-//                source = IntentSource.PRODUCT_SEARCH_LINK;
-//                sourceUrl = dataString;
-//                decodeFormats = DecodeFormatManager.PRODUCT_FORMATS;
-
-            } else if (isZXingURL(dataString)) {
-
-                // Scan formats requested in query string (all formats if none specified).
-                // If a return URL is specified, send the results there. Otherwise, handle it ourselves.
-                source = IntentSource.ZXING_LINK;
-                sourceUrl = dataString;
-                Uri inputUri = Uri.parse(dataString);
-                scanFromWebPageManager = new ScanFromWebPageManager(inputUri);
-                decodeFormats = DecodeFormatManager.parseDecodeFormats(inputUri);
-                // Allow a sub-set of the hints to be specified by the caller.
-                decodeHints = DecodeHintManager.parseDecodeHints(inputUri);
-
-            }
 
             characterSet = intent.getStringExtra(Intents.Scan.CHARACTER_SET);
 
@@ -275,17 +220,6 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
         }
     }
 
-    private static boolean isZXingURL(String dataString) {
-        if (dataString == null) {
-            return false;
-        }
-        for (String url : ZXING_URLS) {
-            if (dataString.startsWith(url)) {
-                return true;
-            }
-        }
-        return false;
-    }
 
     @Override
     protected void onPause() {
@@ -299,7 +233,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
         cameraManager.closeDriver();
         //historyManager = null; // Keep for onActivityResult
         if (!hasSurface) {
-            SurfaceView surfaceView = (SurfaceView) findViewById(R.id.preview_view);
+            SurfaceView surfaceView =  findViewById(R.id.preview_view);
             SurfaceHolder surfaceHolder = surfaceView.getHolder();
             surfaceHolder.removeCallback(this);
         }
@@ -321,7 +255,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
                     finish();
                     return true;
                 }
-                if ((source == IntentSource.NONE || source == IntentSource.ZXING_LINK) && lastResult != null) {
+                if ((source == IntentSource.NONE ) && lastResult != null) {
                     restartPreviewAfterDelay(0L);
                     return true;
                 }
@@ -408,18 +342,10 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 
         switch (source) {
             case NATIVE_APP_INTENT:
-            case PRODUCT_SEARCH_LINK:
                 handleDecodeExternally(rawResult, resultHandler, barcode);
                 break;
-            case ZXING_LINK:
-                if (scanFromWebPageManager == null || !scanFromWebPageManager.isScanFromWebPage()) {
-                    handleDecodeInternally(rawResult, resultHandler, barcode);
-                } else {
-                    handleDecodeExternally(rawResult, resultHandler, barcode);
-                }
-                break;
             case NONE:
-                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+//                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
                 if (fromLiveScan && false) {
                     Toast.makeText(getApplicationContext(),
                             getResources().getString(R.string.msg_bulk_mode_scanned) + " (" + rawResult.getText() + ')',
@@ -484,7 +410,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 
 //    maybeSetClipboard(resultHandler);
 
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+//        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         if (resultHandler.getDefaultButtonID() != null && false) {
             resultHandler.handleButtonPress(resultHandler.getDefaultButtonID());
@@ -631,22 +557,22 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
                 sendReplyMessage(R.id.return_scan_result, intent, resultDurationMS);
                 break;
 
-            case PRODUCT_SEARCH_LINK:
-                // Reformulate the URL which triggered us into a query, so that the request goes to the same
-                // TLD as the scan URL.
-                int end = sourceUrl.lastIndexOf("/scan");
-                String productReplyURL = sourceUrl.substring(0, end) + "?q=" +
-                        resultHandler.getDisplayContents() + "&source=zxing";
-                sendReplyMessage(R.id.launch_product_query, productReplyURL, resultDurationMS);
-                break;
+//            case PRODUCT_SEARCH_LINK:
+//                // Reformulate the URL which triggered us into a query, so that the request goes to the same
+//                // TLD as the scan URL.
+//                int end = sourceUrl.lastIndexOf("/scan");
+//                String productReplyURL = sourceUrl.substring(0, end) + "?q=" +
+//                        resultHandler.getDisplayContents() + "&source=zxing";
+//                sendReplyMessage(R.id.launch_product_query, productReplyURL, resultDurationMS);
+//                break;
 
-            case ZXING_LINK:
-                if (scanFromWebPageManager != null && scanFromWebPageManager.isScanFromWebPage()) {
-                    String linkReplyURL = scanFromWebPageManager.buildReplyURL(rawResult, resultHandler);
-                    scanFromWebPageManager = null;
-                    sendReplyMessage(R.id.launch_product_query, linkReplyURL, resultDurationMS);
-                }
-                break;
+//            case ZXING_LINK:
+//                if (scanFromWebPageManager != null && scanFromWebPageManager.isScanFromWebPage()) {
+//                    String linkReplyURL = scanFromWebPageManager.buildReplyURL(rawResult, resultHandler);
+//                    scanFromWebPageManager = null;
+//                    sendReplyMessage(R.id.launch_product_query, linkReplyURL, resultDurationMS);
+//                }
+//                break;
         }
     }
 
