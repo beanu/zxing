@@ -8,6 +8,9 @@
 
 基于[zxing 3.4.0 Latest commit 24a5f9c on 16 Feb](https://github.com/zxing/zxing)
 
+[下载地址：扫描器](https://github.com/beanu/zxing/releases/download/v0.01/android-release.apk)
+
+
 ## 扫描性能优化
 - 去除zxing额外支持的格式
 - 删除zxing冗余代码
