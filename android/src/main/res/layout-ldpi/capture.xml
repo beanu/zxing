@@ -171,25 +171,25 @@
 
     </LinearLayout>
 
-    <LinearLayout android:id="@+id/result_button_view"
-                  android:orientation="horizontal"
-                  android:layout_width="fill_parent"
-                  android:layout_height="wrap_content"
-                  android:gravity="center">
+<!--    <LinearLayout android:id="@+id/result_button_view"-->
+<!--                  android:orientation="horizontal"-->
+<!--                  android:layout_width="fill_parent"-->
+<!--                  android:layout_height="wrap_content"-->
+<!--                  android:gravity="center">-->
 
-      <Button style="@style/ResultButton"
-              android:visibility="gone"/>
+<!--      <Button style="@style/ResultButton"-->
+<!--              android:visibility="gone"/>-->
 
-      <Button style="@style/ResultButton"
-              android:visibility="gone"/>
+<!--      <Button style="@style/ResultButton"-->
+<!--              android:visibility="gone"/>-->
 
-      <Button style="@style/ResultButton"
-              android:visibility="gone"/>
+<!--      <Button style="@style/ResultButton"-->
+<!--              android:visibility="gone"/>-->
 
-      <Button style="@style/ResultButton"
-              android:visibility="gone"/>
+<!--      <Button style="@style/ResultButton"-->
+<!--              android:visibility="gone"/>-->
 
-    </LinearLayout>
+<!--    </LinearLayout>-->
 
   </LinearLayout>
 
